@@ -179,7 +179,7 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0;m
   <span class="cloud pk" style="width:90px;height:90px;left:46%;bottom:-40px;opacity:.7"></span>
   <div class="wrap hgrid">
     <div>
-      <div class="date"><span id="hDate"></span><button class="vpill" id="bVer" type="button" title="ดูประวัติเวอร์ชัน">v1.4.1 · มีอะไรใหม่</button></div>
+      <div class="date"><span id="hDate"></span><button class="vpill" id="bVer" type="button" title="ดูประวัติเวอร์ชัน">v1.4.2 · มีอะไรใหม่</button></div>
       <h1 id="hTitle">Check ชื่อ คลาส Claude AI</h1>
       <div class="clock"><b id="hClock">--:--:--</b><span id="hStart">เริ่มเรียน 09:00 น.</span></div>
     </div>
@@ -320,7 +320,7 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0;m
   <button class="btn pri big" id="tCopy" type="button">คัดลอก</button>
 </div></dialog>
 
-<footer class="foot" id="foot"><button class="btn" id="bLock" type="button">สำหรับผู้ดูแล</button><p class="ver">เว็บเช็คชื่อคลาส Claude AI · <button class="verlink" id="bVer2" type="button">เวอร์ชัน 1.4.1</button> · อัปเดต 14 พ.ย. 2569</p></footer>
+<footer class="foot" id="foot"><button class="btn" id="bLock" type="button">สำหรับผู้ดูแล</button><p class="ver">เว็บเช็คชื่อคลาส Claude AI · <button class="verlink" id="bVer2" type="button">เวอร์ชัน 1.4.2</button> · อัปเดต 14 พ.ย. 2569</p></footer>
 
 <dialog id="dP"><div class="dl">
   <div class="dh"><div><h2>เมนูผู้ดูแล</h2><p>ใส่รหัสเพื่อนำเข้า แก้ไข หรือส่งออกรายชื่อ</p></div><button class="x" data-close aria-label="ปิด">×</button></div>
@@ -329,10 +329,10 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0;m
 </div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="config.js?v=1.4.1"></script>
+<script src="config.js?v=1.4.2"></script>
 <script>
 {
-const APP_VERSION='1.4.1';
+const APP_VERSION='1.4.2';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const p2=n=>String(n).padStart(2,'0');
@@ -565,7 +565,7 @@ $('#sWipe').onclick=async()=>{if(!wipeArm){wipeArm=true;$('#sWipe').textContent=
   await A.clearPeople();toast('ลบรายชื่อทั้งหมดแล้ว');$('#dS').close()};
 
 /* ---------- version ---------- */
-const CHANGES=[{"v": "1.4.1", "d": "14 พ.ย. 2569", "i": ["เปลี่ยนหัวเว็บจาก \"เช็คชื่อ\" เป็น \"Check ชื่อ\""]}, {"v": "1.4.0", "d": "14 พ.ย. 2569", "i": ["กดป้ายเวอร์ชันที่หัวเว็บหรือท้ายหน้า เพื่อดูประวัติการพัฒนาทุกเวอร์ชัน", "เชื่อมกับ GitHub repo และเผยแพร่ผ่าน GitHub Pages"]}, {"v": "1.3.2", "d": "14 พ.ย. 2569", "i": ["ใส่รายชื่อผู้เข้าเรียนไว้ในหน้าเว็บ อัปโหลดไฟล์เดียวรายชื่อก็ขึ้น", "กันเบราว์เซอร์ใช้ไฟล์ตั้งค่าตัวเก่า"]}, {"v": "1.3.1", "d": "14 พ.ย. 2569", "i": ["แก้รายชื่อไม่ขึ้นบน GitHub Pages"]}, {"v": "1.3.0", "d": "14 พ.ย. 2569", "i": ["หน้าตาน่ารักขึ้น: น้องเมฆ ฟอนต์กลมมน พื้นหลังลายจุด ปุ่มหัวใจ", "หน้า \"เช็คอินสำเร็จ\" มีหัวใจลอย", "แก้หัวข้อซ้อนกับวันที่ และแสดงเลขเวอร์ชัน", "จัดไฟล์พร้อมขึ้น GitHub และบันทึกลง Google Sheets"]}, {"v": "1.2.0", "d": "14 พ.ย. 2569", "i": ["การ์ดใหญ่ขึ้น เรียงแถวละ 2 ชื่อ", "เพิ่มโทนสีชมพูพาสเทล", "แสดงเวลาเช็คอินบนการ์ด และหน้าเช็คอินสำเร็จ"]}, {"v": "1.1.0", "d": "14 พ.ย. 2569", "i": ["แจ้งชื่อที่ถูกต้องได้ตอนเช็คอิน ผู้ดูแลอนุมัติหรือแก้ชื่อได้", "บันทึกลง Google Sheets"]}, {"v": "1.0.0", "d": "14 พ.ย. 2569", "i": ["รายชื่อ ค้นหา กรอง เช็คอินพร้อมเวลาและลายเซ็น", "นำเข้า CSV / Excel และส่งออก", "ใช้ได้ทั้งมือถือ แท็บเล็ต คอมพิวเตอร์"]}];
+const CHANGES=[{"v": "1.4.2", "d": "14 พ.ย. 2569", "i": ["เชื่อมกับ Google Sheets แล้ว ข้อมูลเช็คชื่อบันทึกลงชีตทันที"]}, {"v": "1.4.1", "d": "14 พ.ย. 2569", "i": ["เปลี่ยนหัวเว็บจาก \"เช็คชื่อ\" เป็น \"Check ชื่อ\""]}, {"v": "1.4.0", "d": "14 พ.ย. 2569", "i": ["กดป้ายเวอร์ชันที่หัวเว็บหรือท้ายหน้า เพื่อดูประวัติการพัฒนาทุกเวอร์ชัน", "เชื่อมกับ GitHub repo และเผยแพร่ผ่าน GitHub Pages"]}, {"v": "1.3.2", "d": "14 พ.ย. 2569", "i": ["ใส่รายชื่อผู้เข้าเรียนไว้ในหน้าเว็บ อัปโหลดไฟล์เดียวรายชื่อก็ขึ้น", "กันเบราว์เซอร์ใช้ไฟล์ตั้งค่าตัวเก่า"]}, {"v": "1.3.1", "d": "14 พ.ย. 2569", "i": ["แก้รายชื่อไม่ขึ้นบน GitHub Pages"]}, {"v": "1.3.0", "d": "14 พ.ย. 2569", "i": ["หน้าตาน่ารักขึ้น: น้องเมฆ ฟอนต์กลมมน พื้นหลังลายจุด ปุ่มหัวใจ", "หน้า \"เช็คอินสำเร็จ\" มีหัวใจลอย", "แก้หัวข้อซ้อนกับวันที่ และแสดงเลขเวอร์ชัน", "จัดไฟล์พร้อมขึ้น GitHub และบันทึกลง Google Sheets"]}, {"v": "1.2.0", "d": "14 พ.ย. 2569", "i": ["การ์ดใหญ่ขึ้น เรียงแถวละ 2 ชื่อ", "เพิ่มโทนสีชมพูพาสเทล", "แสดงเวลาเช็คอินบนการ์ด และหน้าเช็คอินสำเร็จ"]}, {"v": "1.1.0", "d": "14 พ.ย. 2569", "i": ["แจ้งชื่อที่ถูกต้องได้ตอนเช็คอิน ผู้ดูแลอนุมัติหรือแก้ชื่อได้", "บันทึกลง Google Sheets"]}, {"v": "1.0.0", "d": "14 พ.ย. 2569", "i": ["รายชื่อ ค้นหา กรอง เช็คอินพร้อมเวลาและลายเซ็น", "นำเข้า CSV / Excel และส่งออก", "ใช้ได้ทั้งมือถือ แท็บเล็ต คอมพิวเตอร์"]}];
 function openVer(){$('#wSub').textContent='ตอนนี้ใช้เวอร์ชัน '+APP_VERSION;
   $('#wList').innerHTML=CHANGES.map(c=>`<div class="vitem${c.v===APP_VERSION?' cur':''}"><div class="vhead"><b>v${esc(c.v)}</b>${c.v===APP_VERSION?'<span class="tag ok">เวอร์ชันปัจจุบัน</span>':''}<small>${esc(c.d)}</small></div><ul>${c.i.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('');
   $('#dW').showModal()}

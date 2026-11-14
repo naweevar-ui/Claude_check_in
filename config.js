@@ -10,7 +10,7 @@
  *             หมายเหตุ: ถ้า repo เป็นแบบ Public ใครก็เปิดอ่านรายชื่อนี้ได้
  */
 window.CHECKIN_CONFIG = {
-  GAS_URL: '',
+  GAS_URL: 'https://script.google.com/macros/s/AKfycbyL1WL_WVgH5ALhhwF3_H7HEgbVKD7PsA2KqvFqyAwxcZB5Doqc_LZrvdh_VLxzUN_Q/exec',
   ADMIN_PIN: '',
   POLL_MS: 15000,
   // รายชื่อผู้เข้าเรียน 22 คน (ขึ้นทันทีแม้ยังไม่เชื่อม Google Sheets)
