@@ -1,5 +1,5 @@
 /**
- * Backend สำหรับเว็บเช็คชื่อคลาส Claude AI — เวอร์ชัน 1.3.0
+ * Backend สำหรับเว็บเช็คชื่อคลาส Claude AI — เวอร์ชัน 1.3.1
  * วางไฟล์นี้ใน Google Sheets > ส่วนขยาย > Apps Script แล้ว Deploy เป็น Web app (ดู README.md)
  *
  * สร้างชีตให้อัตโนมัติ 3 แผ่น: รายชื่อ / เช็คอิน / ตั้งค่า
@@ -39,7 +39,7 @@ const str_ = v => v instanceof Date ? Utilities.formatDate(v, Session.getScriptT
 const time_ = v => v instanceof Date ? Utilities.formatDate(v, Session.getScriptTimeZone(), 'HH:mm') : String(v);
 const json_ = o => ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 
-const VERSION = '1.3.0';
+const VERSION = '1.3.1';
 
 function doGet() {
   const out = { ok: true, version: VERSION, settings: {} };
