@@ -170,7 +170,7 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0;m
   <span class="cloud pk" style="width:90px;height:90px;left:46%;bottom:-40px;opacity:.7"></span>
   <div class="wrap hgrid">
     <div>
-      <div class="date"><span id="hDate"></span><span class="vpill">v1.3.1</span></div>
+      <div class="date"><span id="hDate"></span><span class="vpill">v1.3.2</span></div>
       <h1 id="hTitle">เช็คชื่อ คลาส Claude AI</h1>
       <div class="clock"><b id="hClock">--:--:--</b><span id="hStart">เริ่มเรียน 09:00 น.</span></div>
     </div>
@@ -307,7 +307,7 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0;m
   <button class="btn pri big" id="tCopy" type="button">คัดลอก</button>
 </div></dialog>
 
-<footer class="foot" id="foot"><button class="btn" id="bLock" type="button">สำหรับผู้ดูแล</button><p class="ver">เว็บเช็คชื่อคลาส Claude AI · เวอร์ชัน 1.3.1 · อัปเดต 14 พ.ย. 2569</p></footer>
+<footer class="foot" id="foot"><button class="btn" id="bLock" type="button">สำหรับผู้ดูแล</button><p class="ver">เว็บเช็คชื่อคลาส Claude AI · เวอร์ชัน 1.3.2 · อัปเดต 14 พ.ย. 2569</p></footer>
 
 <dialog id="dP"><div class="dl">
   <div class="dh"><div><h2>เมนูผู้ดูแล</h2><p>ใส่รหัสเพื่อนำเข้า แก้ไข หรือส่งออกรายชื่อ</p></div><button class="x" data-close aria-label="ปิด">×</button></div>
@@ -316,10 +316,10 @@ dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0;m
 </div></dialog>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="config.js"></script>
+<script src="config.js?v=1.3.2"></script>
 <script>
 {
-const APP_VERSION='1.3.1';
+const APP_VERSION='1.3.2';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const p2=n=>String(n).padStart(2,'0');
@@ -331,7 +331,7 @@ const L={people:new Map(),checks:new Map(),set:null,cb:{}};
 /* ค่าตั้งต้นอ่านจากไฟล์ config.js (window.CHECKIN_CONFIG) — แก้ที่ไฟล์นั้น ไม่ต้องแก้ไฟล์นี้ */
 const CFG=window.CHECKIN_CONFIG||{};
 const CONFIG={GAS_URL:String(CFG.GAS_URL||'').trim(),ADMIN_PIN:String(CFG.ADMIN_PIN||''),POLL_MS:Number(CFG.POLL_MS)||15000};
-const SEED=Array.isArray(CFG.SEED)?CFG.SEED:[];
+const SEED=(Array.isArray(CFG.SEED)&&CFG.SEED.length)?CFG.SEED:[{"id": "p001", "name": "ภณธกร วงศ์เจริญ", "org": "เบทาโกร", "order": 1}, {"id": "p002", "name": "วิภาดา พลาธนพร", "org": "Foodle Noodle Co., Ltd.", "order": 2}, {"id": "p003", "name": "สิริวรรณ รอดศิริ", "org": "Foodle Noodle Co., Ltd.", "order": 3}, {"id": "p004", "name": "วิศรุต สุดสัตย์", "org": "Foodle Noodle Co., Ltd.", "order": 4}, {"id": "p005", "name": "กิตติธัช ธูปถมพงศ์", "org": "Foodle Noodle Co., Ltd.", "order": 5}, {"id": "p006", "name": "วราภรณ์ หวานล้ำ", "org": "บริษัท โอชาฟูดแพ็ค จำกัด", "order": 6}, {"id": "p007", "name": "ณัฏชา แสวงหอม", "org": "บริษัท โอชาฟูดแพ็ค จำกัด", "order": 7}, {"id": "p008", "name": "นรพนธ์ จิรัฐิติกาลพงศ์", "org": "บริษัท ซีเอ็ม พรีเมี่ยม ไรซ์ จำกัด", "order": 8}, {"id": "p009", "name": "คงติภูมิ มณีโชค", "org": "บริษัท ซีเอ็ม พรีเมี่ยม ไรซ์ จำกัด", "order": 9}, {"id": "p010", "name": "จิดาภา ทองเกิด", "org": "เทพผดุงพรมะพร้าว จำกัด", "order": 10}, {"id": "p011", "name": "สุชาดา เอี่ยมสำอางค์", "org": "เทพผดุงพรมะพร้าว จำกัด", "order": 11}, {"id": "p012", "name": "พิชญา พิสุทธิ์พิเชฎฐ์", "org": "เทพผดุงพรมะพร้าว จำกัด", "order": 12}, {"id": "p013", "name": "วันทนา จุตาลานนท์", "org": "เทพผดุงพรมะพร้าว จำกัด", "order": 13}, {"id": "p014", "name": "ธนวรรณ ตั้งตรงพานิช", "org": "บริษัท โอชาฟูดแพ็ค จำกัด", "order": 14}, {"id": "p015", "name": "ระวีวรรณ การภักดี", "org": "บริษัท โอชาฟูดแพ็ค จำกัด", "order": 15}, {"id": "p016", "name": "คณาธิป จำนงค์", "org": "บริษัท ลาโต้ ฟู้ดแอนด์ดริ้งส์ จำกัด", "order": 16}, {"id": "p017", "name": "พรพิมล ผลเพิ่ม", "org": "บริษัท ลาโต้ ฟู้ดแอนด์ดริ้งส์ จำกัด", "order": 17}, {"id": "p018", "name": "รัตติยากร ฉายหิรัญ", "org": "บริษัท สยาม คอนซูมเมอร์ โปรดักส์ จำกัด", "order": 18}, {"id": "p019", "name": "วิชยุตม์ กีรติธนาภรณ์", "org": "บริษัท เมอร์เดียนท์ จำกัด", "order": 19}, {"id": "p020", "name": "จิตรา คำแหง", "org": "บริษัท โอชาฟูดแพ็ค จำกัด", "order": 20}, {"id": "p021", "name": "อรณิชา ครองศักดิ์ศิริ", "org": "บริษัท โอชาฟูดแพ็ค จำกัด", "order": 21}, {"id": "p022", "name": "นัทธมน พุทธพรม", "org": "บริษัท โอชาฟูดแพ็ค จำกัด", "order": 22}];
 const LS='claude-checkin-v1';
 
 const emit=()=>{L.cb.p&&L.cb.p();L.cb.c&&L.cb.c();L.cb.s&&L.cb.s()};
