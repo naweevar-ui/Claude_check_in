@@ -1,0 +1,6 @@
+# ไฟล์รายชื่อจริงของผู้เข้าเรียน (ไม่อัปขึ้น GitHub)
+private/
+*.xlsx
+attendees*.csv
+!templates/attendees-template.csv
+.DS_Store
