@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>เช็คชื่อคลาส Claude AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Mali:wght@500;600;700&family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<style>
+/* VOICE: friendly, playful classroom front desk, calm and quick to use
+   IDEA: a pastel sign-in sheet on a clipboard at the classroom door
+   PICTURE: the live roster itself, with a progress ring of who has arrived
+   COLOUR and TYPE: white and baby-blue fields, mint/peach/lilac status chips; Prompt + IBM Plex Sans Thai
+   LAYOUT: header with clock and ring, sticky search bar, card grid that collapses to one column on phones */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f8ff,#0d1828);--card:light-dark(#fff,#16263d);--ink:light-dark(#163150,#e7f0fc);--mute:light-dark(#5b7490,#9fb3cb);
+--line:light-dark(#d8e7f7,#26405f);--sky:light-dark(#d3e8ff,#22436c);--sky2:light-dark(#e9f4ff,#182c47);--blue:light-dark(#3b8be3,#7ab8ff);--deep:light-dark(#1c5ca3,#b3d6ff);
+--mint:light-dark(#d5f4e8,#1b463c);--mintI:light-dark(#1d7656,#9fe6cb);--peach:light-dark(#ffe5d9,#4b2e27);--peachI:light-dark(#ad4e2c,#ffc3a9);
+--lilac:light-dark(#e7e5ff,#2e2d58);--lilacI:light-dark(#5549bf,#cbc6ff);--butter:light-dark(#fff2c6,#463d20);--pink:light-dark(#ffe1ec,#4a2638);--pinkI:light-dark(#b8467a,#ffb8d5);--pink2:light-dark(#fff0f6,#2a1a2a);--butterI:light-dark(#8a6a0c,#f3dc8c);
+--fd:Mali,Prompt,"IBM Plex Sans Thai",sans-serif;--dot:light-dark(#dce9f9,#18294a);
+--sh:0 1px 2px rgb(30 80 140/.06),0 10px 28px rgb(30 80 140/.08);--r:20px}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
+body{margin:0;background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.4px,transparent 1.6px);background-size:26px 26px;color:var(--ink);font:16px/1.55 "IBM Plex Sans Thai",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.ttl{font-family:var(--fd);margin:0;line-height:1.4}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+header.top{position:relative;overflow:hidden;background:linear-gradient(125deg,var(--sky) 0%,var(--sky2) 45%,var(--pink2) 75%,var(--pink) 100%);padding:clamp(22px,4vw,48px) 0 clamp(20px,3vw,36px)}
+.cloud{position:absolute;border-radius:50%;background:light-dark(#fff,#1d3352);opacity:.7;filter:blur(1px)}.cloud.pk{background:var(--pink)}
+.hgrid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:24px;align-items:center}
+header.top{padding-bottom:clamp(44px,5vw,64px)!important}
+.wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:42px;display:block}
+.buddy{width:178px;height:auto;overflow:visible}
+.bob{animation:bob 3.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-7px)}}
+.spk{animation:tw 2.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes tw{50%{transform:scale(.6);opacity:.5}}
+.date{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;color:var(--deep);font-weight:500;line-height:1.4}
+.vpill{font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--card);color:var(--pinkI);box-shadow:var(--sh)}
+.foot{display:grid;justify-items:center;gap:10px;padding:8px max(4vw,16px) 32px;text-align:center}
+.ver{margin:0;color:var(--mute);font-size:13px}
+h1{font-size:clamp(30px,5vw,48px);font-weight:700;line-height:1.45;margin:14px 0 14px;padding-top:.1em;text-wrap:balance}
+.clock{display:inline-flex;align-items:baseline;gap:10px;background:var(--card);border-radius:999px;padding:8px 18px;box-shadow:var(--sh)}
+.clock b{font-family:var(--fd);font-size:24px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.clock span{color:var(--mute);font-size:14px;white-space:nowrap}
+.prog{display:flex;gap:18px;align-items:center;background:var(--card);border-radius:28px;padding:16px 22px 16px 16px;box-shadow:var(--sh)}
+.ring{position:relative;width:118px;height:118px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:11}
+.ring .bgc{stroke:var(--pink2)}.ring .fg{stroke:url(#rg);stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring b{font-family:var(--fd);font-size:30px;line-height:1}.ring small{color:var(--mute);font-size:13px}
+.stats{display:grid;gap:6px;font-size:14px}
+.stats div{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.stats b{font-variant-numeric:tabular-nums;margin-left:auto;padding-left:14px}
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-block:12px}
+.search{flex:1 1 260px;position:relative}
+.search input{width:100%;height:48px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:0 14px 0 44px;font-size:16px}
+.search svg{position:absolute;left:14px;top:14px;width:20px;height:20px;color:var(--mute)}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chip{height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);white-space:nowrap;font-weight:500}
+.chip[aria-pressed=true]{background:linear-gradient(120deg,var(--blue),#e98bb8);border-color:transparent;color:#fff}
+.chip{font-family:var(--fd)}
+.chip#chFix[aria-pressed=true]{background:var(--pinkI);border-color:var(--pinkI)}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:500;white-space:nowrap}
+.btn svg{width:18px;height:18px;flex:none}
+.btn:hover{border-color:var(--blue)}
+.pri{background:linear-gradient(120deg,var(--blue),#e98bb8);border-color:transparent;color:#fff;font-family:var(--fd);font-weight:600}
+.pri:disabled{opacity:.45;cursor:not-allowed}
+.danger{color:var(--peachI);border-color:var(--peach)}
+.note{margin:0 0 16px;padding:12px 16px;border-radius:14px;background:var(--butter);color:var(--butterI);font-size:14px}
+main{padding-block:20px 60px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.p{display:flex;align-items:center;gap:16px;background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:18px 18px 18px 20px;min-height:104px;box-shadow:0 1px 2px rgb(30 80 140/.04);transition:border-color .2s,transform .2s}
+.p:hover{border-color:color-mix(in srgb,var(--pinkI) 40%,var(--line))}
+.p.in{border-color:color-mix(in srgb,var(--mintI) 35%,var(--line));background:linear-gradient(90deg,var(--card),color-mix(in srgb,var(--mint) 45%,var(--card)))}
+.p.pop{animation:pop .6s ease}
+@keyframes pop{40%{transform:scale(1.03)}}
+.av{width:46px;height:46px;border-radius:15px;display:grid;place-content:center;font-family:var(--fd);font-weight:600;font-size:17px;flex:none}
+.p .av{width:62px;height:62px;border-radius:46% 54% 50% 50%/55% 45% 55% 45%;font-size:21px}
+.p{border-radius:28px!important}
+.p.in{border-style:dashed}
+.c0{background:var(--sky);color:var(--deep)}.c1{background:var(--mint);color:var(--mintI)}.c2{background:var(--lilac);color:var(--lilacI)}.c3{background:var(--peach);color:var(--peachI)}.c4{background:var(--butter);color:var(--butterI)}.c5{background:var(--pink);color:var(--pinkI)}
+.info{flex:1}
+.info b{display:block;font-family:var(--fd);font-weight:500;font-size:20px;line-height:1.3;overflow-wrap:anywhere}
+.info small{display:block;color:var(--mute);font-size:15px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.go{display:inline-flex;align-items:center;gap:8px;height:54px;padding:0 24px;border-radius:16px;border:0;background:var(--pink);color:var(--pinkI);font-family:var(--fd);font-weight:600;font-size:18px;white-space:nowrap;flex:none}
+.go:hover{background:var(--pinkI);color:#fff}
+.done{display:flex;flex-direction:column;align-items:flex-end;gap:3px;background:none;border:0;padding:2px;text-align:right}
+.done .t{font-family:var(--fd);font-weight:600;font-size:19px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tag{font-size:13px;padding:3px 10px;border-radius:999px;white-space:nowrap;font-weight:500}
+.tag.ok{background:var(--mint);color:var(--mintI)}.tag.late{background:var(--peach);color:var(--peachI)}
+.sig{height:34px;max-width:110px;background:#fff;border-radius:6px;padding:1px 4px}
+.empty{text-align:center;padding:56px 20px;background:var(--card);border:2px dashed var(--line);border-radius:28px}
+.empty svg{width:120px;height:120px}
+.empty h3{font-size:22px;margin:10px 0 6px}.empty p{color:var(--mute);margin:0 0 18px}
+.empty .tools{justify-content:center}
+dialog{border:0;padding:0;border-radius:26px;background:var(--card);color:var(--ink);width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);box-shadow:0 30px 80px rgb(20 60 110/.3)}
+dialog::backdrop{background:rgb(22 49 80/.35);backdrop-filter:blur(3px)}
+.dl{padding:22px;display:grid;gap:16px}
+.dh{display:flex;gap:14px;align-items:center}
+.dh h2{font-size:22px}.dh p{margin:2px 0 0;color:var(--mute);font-size:14px}
+.x{margin-left:auto;width:44px;height:44px;border-radius:12px;border:0;background:var(--sky2);font-size:24px;line-height:1;flex:none}
+.now{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--sky2);border-radius:16px;padding:12px 16px}
+.now span{color:var(--mute);font-size:14px}.now strong{font-family:var(--fd);font-size:28px;font-variant-numeric:tabular-nums}
+.now .tag{margin-left:auto}
+.lbl{font-weight:600;font-size:15px}.lbl small{color:var(--mute);font-weight:400}
+.padw{position:relative;background:#fff;border:2px dashed #b9d6f5;border-radius:18px;aspect-ratio:21/9;touch-action:none}
+#pad{position:absolute;inset:0;width:100%;height:100%;border-radius:16px;touch-action:none;cursor:crosshair}
+.hint{position:absolute;inset:0;display:grid;place-content:center;color:#9bb4cf;pointer-events:none;font-size:15px}
+.padw .line{position:absolute;left:8%;right:8%;bottom:24%;border-bottom:1.5px solid #dbe9f8;pointer-events:none}
+.clr{position:absolute;right:8px;top:8px;height:36px;padding:0 12px;border-radius:10px;border:1px solid #d8e7f7;background:#f3f8ff;color:#1c5ca3;font-size:14px}
+.big{height:54px;font-size:17px;border-radius:16px;width:100%;justify-content:center}
+.sigbig{background:#fff;border-radius:16px;border:1.5px solid var(--line);padding:10px;text-align:center}
+.sigbig img{max-width:100%;height:150px;object-fit:contain}
+.fld{display:grid;gap:6px}.fld span{font-size:14px;font-weight:500}
+.fld input,.fld textarea,.fld select{border:1.5px solid var(--line);border-radius:12px;background:var(--bg);padding:10px 12px;font-size:16px;min-height:46px}
+textarea{resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1 1 180px}
+.drop{border:2px dashed #b9d6f5;border-radius:18px;padding:22px;text-align:center;background:var(--sky2);display:grid;gap:6px;place-items:center}
+.drop.on{border-color:var(--blue)}
+.drop small{color:var(--mute)}
+.prev{font-size:14px;border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:190px}
+.prev table{border-collapse:collapse;width:100%}.prev td,.prev th{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.prev th{background:var(--sky2);font-weight:600}
+.opt{display:flex;gap:10px;align-items:center;min-height:44px}
+.opt input{width:20px;height:20px;accent-color:var(--blue)}
+.mute{color:var(--mute);font-size:14px;margin:0}
+.lnk{background:none;border:0;color:var(--deep);text-decoration:underline;text-underline-offset:3px;padding:0;min-height:44px;font-size:15px;text-align:left;justify-self:start}
+.tag.fx{background:var(--lilac);color:var(--lilacI)}
+.ed{width:50px;height:50px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--mute);flex:none;display:grid;place-content:center}
+.ed svg{width:18px;height:18px}
+.fixbox{background:var(--lilac);color:var(--lilacI)}
+.edit{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:14px}
+.when{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:4px 12px;border-radius:999px;background:var(--mint);color:var(--mintI);font-size:15px;font-weight:600;white-space:nowrap}
+.when svg{width:16px;height:16px;flex:none}
+.done small{color:var(--mute);font-size:12px}
+.okd{text-align:center;justify-items:center;padding:30px 24px 24px}
+.okd .ck{position:relative;width:150px;animation:pop .6s ease}
+.okd .ck>svg:first-child{width:150px;height:auto}
+.hrt{position:absolute;width:22px;height:22px;bottom:30px;opacity:0;animation:up 2.2s ease-out infinite}
+.hrt:nth-child(2){left:-6px;animation-delay:.2s}.hrt:nth-child(3){right:-4px;animation-delay:.7s;width:16px}.hrt:nth-child(4){left:40%;animation-delay:1.2s;width:14px}
+@keyframes up{0%{transform:translateY(10px) scale(.5);opacity:0}25%{opacity:1}100%{transform:translateY(-70px) scale(1);opacity:0}}
+.okd h2{font-size:26px}.okd .nm{font-size:20px;font-weight:600;margin:0}
+.okd .tm{font-family:var(--fd);font-size:46px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--deep)}
+.okd .lb{color:var(--mute);margin:0}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:14px;font-weight:500;transition:transform .3s;z-index:50;max-width:calc(100vw - 32px)}
+.toast.on{transform:translate(-50%,0)}
+@media(max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.done small,.done .t{display:none}}
+@media(max-width:420px){.p{padding:14px;gap:12px}.p .av{width:50px;height:50px;font-size:18px}.info b{font-size:18px}.go{padding:0 16px;font-size:16px;height:50px}.ed{width:44px;height:44px}}
+@media(max-width:900px){.buddy{width:130px}}
+@media(max-width:700px){.hgrid>div:first-child{padding-right:96px}.buddy{position:absolute;right:-4px;top:-6px;width:104px}
+.hgrid{grid-template-columns:minmax(0,1fr)}.prog{justify-self:stretch}
+dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0;max-height:94dvh}.padw{aspect-ratio:16/9}.tools .btn .tx{display:none}.tools .btn{padding:0 12px}}
+@media(prefers-reduced-motion:reduce){.bob,.spk,.hrt{animation:none!important}*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="cloud" style="width:220px;height:220px;right:-60px;top:-80px"></span>
+  <span class="cloud pk" style="width:140px;height:140px;right:240px;top:-60px;opacity:.8"></span>
+  <span class="cloud pk" style="width:90px;height:90px;left:46%;bottom:-40px;opacity:.7"></span>
+  <div class="wrap hgrid">
+    <div>
+      <div class="date"><span id="hDate"></span><span class="vpill">v1.3.0</span></div>
+      <h1 id="hTitle">เช็คชื่อ คลาส Claude AI</h1>
+      <div class="clock"><b id="hClock">--:--:--</b><span id="hStart">เริ่มเรียน 09:00 น.</span></div>
+    </div>
+    <svg class="buddy" viewBox="0 0 210 180" aria-hidden="true">
+      <ellipse cx="100" cy="168" rx="58" ry="7" fill="#bcd8f7" opacity=".55"/>
+      <g class="bob">
+        <path d="M54 136c-21 0-36-15-36-34 0-18 14-32 32-33 4-26 26-44 53-44 23 0 43 14 50 35 21 1 38 18 38 39 0 20-17 37-38 37z" fill="#fff" stroke="#b3d3f6" stroke-width="4"/>
+        <ellipse cx="80" cy="92" rx="6.5" ry="8.5" fill="#1f3c63"/><ellipse cx="126" cy="92" rx="6.5" ry="8.5" fill="#1f3c63"/>
+        <circle cx="82.5" cy="88.5" r="2.4" fill="#fff"/><circle cx="128.5" cy="88.5" r="2.4" fill="#fff"/>
+        <ellipse cx="64" cy="109" rx="11" ry="6.5" fill="#ffc6db"/><ellipse cx="142" cy="109" rx="11" ry="6.5" fill="#ffc6db"/>
+        <path d="M92 107q11 11 22 0" fill="none" stroke="#1f3c63" stroke-width="4" stroke-linecap="round"/>
+        <g transform="translate(148 104) rotate(12)"><rect width="46" height="56" rx="9" fill="#ffe4ee" stroke="#f29cc3" stroke-width="3"/><rect x="13" y="-7" width="20" height="11" rx="5" fill="#f29cc3"/><path d="m12 29 8 8 14-17" fill="none" stroke="#c0508a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+      </g>
+      <path class="spk" d="M26 34l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#f49ac1"/>
+      <path class="spk" style="animation-delay:.9s" d="M184 14l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#8cc2ff"/>
+      <circle cx="196" cy="70" r="4.5" fill="#ffd36e"/><circle cx="14" cy="96" r="3.5" fill="#b9b2ff"/>
+    </svg>
+    <div class="prog" aria-label="ความคืบหน้าการเช็คชื่อ">
+      <div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7ab8ff"/><stop offset="1" stop-color="#f49ac1"/></linearGradient></defs><circle class="bgc" cx="60" cy="60" r="52"/><circle class="fg" id="ringFg" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg>
+        <div><b id="rNum">0</b><small id="rOf">จาก 0 คน</small></div></div>
+      <div class="stats">
+        <div><span class="dot" style="background:var(--mintI)"></span>ตรงเวลา<b id="sOk">0</b></div>
+        <div><span class="dot" style="background:var(--peachI)"></span>มาสาย<b id="sLate">0</b></div>
+        <div><span class="dot" style="background:var(--pinkI)"></span>ยังไม่มา<b id="sWait">0</b></div>
+      </div>
+    </div>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 42" preserveAspectRatio="none" aria-hidden="true"><path d="M0 26C180 44 360 6 540 18s360 26 540 10 270-22 360-8V42H0z" fill="var(--bg)"/></svg>
+</header>
+
+<div class="bar"><div class="wrap">
+  <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="พิมพ์ชื่อของคุณ แล้วกดเช็คอินได้เลย" autocomplete="off" aria-label="ค้นหาชื่อ"></label>
+  <div class="chips" role="group" aria-label="กรองรายชื่อ">
+    <button class="chip" data-f="all" aria-pressed="true">ทั้งหมด</button>
+    <button class="chip" data-f="wait" aria-pressed="false">ยังไม่มา</button>
+    <button class="chip" data-f="in" aria-pressed="false">มาแล้ว</button>
+    <button class="chip" data-f="fix" aria-pressed="false" hidden id="chFix">ขอแก้ชื่อ</button>
+  </div>
+  <div class="tools" id="adm" hidden>
+    <button class="btn" id="bImp" title="นำเข้า CSV / Excel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L7 8m5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg><span class="tx">นำเข้า</span></button>
+    <button class="btn" id="bAdd" title="เพิ่มรายชื่อ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg><span class="tx">เพิ่มชื่อ</span></button>
+    <button class="btn" id="bExp" title="ส่งออก CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg><span class="tx">CSV</span></button>
+    <button class="btn" id="bCopy" title="คัดลอกไปวางใน Google Sheets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span class="tx">Google Sheets</span></button>
+    <button class="btn" id="bSet" title="ตั้งค่า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="tx">ตั้งค่า</span></button>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <div id="banner"></div>
+  <div id="list" class="grid" aria-live="polite"></div>
+</main>
+
+<dialog id="dC"><div class="dl">
+  <div class="dh"><div class="av c0" id="cAv"></div><div><h2 id="cName"></h2><p id="cSub"></p></div><button class="x" data-close aria-label="ปิด">×</button></div>
+  <div class="now"><span>เวลาที่มาถึง</span><strong id="cTime"></strong><span class="tag" id="cStat"></span></div>
+  <button type="button" class="lnk" id="fixT">ชื่อสะกดผิด? แจ้งชื่อที่ถูกต้อง</button>
+  <label class="fld" id="fixF" hidden><span>ชื่อ-นามสกุลที่ถูกต้อง (ผู้ดูแลจะตรวจสอบและแก้ให้)</span><input id="fixIn" maxlength="120" autocomplete="name"></label>
+  <div class="lbl">ลงลายมือชื่อ <small id="cReq"></small></div>
+  <div class="padw"><span class="line"></span><span class="hint" id="hint">เซ็นชื่อตรงนี้ด้วยนิ้ว ปากกา หรือเมาส์</span><canvas id="pad" aria-label="ช่องเซ็นลายเซ็น"></canvas><button class="clr" id="clr" type="button">ล้าง</button></div>
+  <button class="btn pri big" id="cOk" type="button">ยืนยันการเข้าเรียน</button>
+</div></dialog>
+
+<dialog id="dOk"><div class="dl okd">
+  <div class="ck"><svg class="" viewBox="0 0 210 180" aria-hidden="true">
+      <ellipse cx="100" cy="168" rx="58" ry="7" fill="#bcd8f7" opacity=".55"/>
+      <g class="bob">
+        <path d="M54 136c-21 0-36-15-36-34 0-18 14-32 32-33 4-26 26-44 53-44 23 0 43 14 50 35 21 1 38 18 38 39 0 20-17 37-38 37z" fill="#fff" stroke="#b3d3f6" stroke-width="4"/>
+        <ellipse cx="80" cy="92" rx="6.5" ry="8.5" fill="#1f3c63"/><ellipse cx="126" cy="92" rx="6.5" ry="8.5" fill="#1f3c63"/>
+        <circle cx="82.5" cy="88.5" r="2.4" fill="#fff"/><circle cx="128.5" cy="88.5" r="2.4" fill="#fff"/>
+        <ellipse cx="64" cy="109" rx="11" ry="6.5" fill="#ffc6db"/><ellipse cx="142" cy="109" rx="11" ry="6.5" fill="#ffc6db"/>
+        <path d="M92 107q11 11 22 0" fill="none" stroke="#1f3c63" stroke-width="4" stroke-linecap="round"/>
+        <g transform="translate(148 104) rotate(12)"><rect width="46" height="56" rx="9" fill="#ffe4ee" stroke="#f29cc3" stroke-width="3"/><rect x="13" y="-7" width="20" height="11" rx="5" fill="#f29cc3"/><path d="m12 29 8 8 14-17" fill="none" stroke="#c0508a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+      </g>
+      <path class="spk" d="M26 34l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#f49ac1"/>
+      <path class="spk" style="animation-delay:.9s" d="M184 14l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#8cc2ff"/>
+      <circle cx="196" cy="70" r="4.5" fill="#ffd36e"/><circle cx="14" cy="96" r="3.5" fill="#b9b2ff"/>
+    </svg><svg class="hrt" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#f49ac1"/></svg><svg class="hrt" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#f49ac1"/></svg><svg class="hrt" viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#f49ac1"/></svg></div>
+  <h2>เช็คอินสำเร็จ เย้!</h2>
+  <p class="nm" id="okName"></p>
+  <p class="lb">เวลาเช็คอิน</p>
+  <div class="tm" id="okTime"></div>
+  <span class="tag" id="okStat"></span>
+  <p class="lb" id="okFix" hidden></p>
+  <button class="btn pri big" id="okGo" type="button">เสร็จสิ้น</button>
+</div></dialog>
+<dialog id="dV"><div class="dl">
+  <div class="dh"><div class="av c1" id="vAv"></div><div><h2 id="vName"></h2><p id="vSub"></p></div><button class="x" data-close aria-label="ปิด">×</button></div>
+  <div class="now" id="vNow"><span>เช็คอินเวลา</span><strong id="vTime"></strong><span class="tag" id="vStat"></span></div>
+  <div class="sigbig" id="vSig"></div>
+  <div class="now fixbox" id="vFix" hidden></div>
+  <div class="edit" id="vEdit" hidden>
+    <label class="fld"><span>แก้ไขชื่อ-นามสกุล</span><input id="eName" maxlength="120"></label>
+    <label class="fld"><span>บริษัท/หน่วยงาน</span><input id="eOrg" maxlength="120"></label>
+    <button class="btn pri" id="eGo" type="button">บันทึกการแก้ไข</button>
+  </div>
+  <button class="btn danger big" id="vUndo" type="button" hidden>ยกเลิกการเช็คอิน</button>
+</div></dialog>
+
+<dialog id="dI"><div class="dl">
+  <div class="dh"><div><h2>นำเข้ารายชื่อผู้เข้าเรียน</h2><p>รองรับไฟล์ .csv .xlsx .xls (แถวแรกเป็นหัวคอลัมน์)</p></div><button class="x" data-close aria-label="ปิด">×</button></div>
+  <label class="drop" id="drop"><b>เลือกไฟล์ หรือ ลากไฟล์มาวางที่นี่</b><small>ระบบหาคอลัมน์ ชื่อ-นามสกุล, ชื่อเล่น, รหัส, บริษัท/หน่วยงาน, อีเมล, เบอร์โทร ให้อัตโนมัติ</small>
+    <input type="file" id="file" accept=".csv,.xlsx,.xls,.tsv,.txt" hidden></label>
+  <div id="iRes" hidden>
+    <p class="mute" id="iSum"></p>
+    <div class="prev" id="iPrev"></div>
+    <label class="opt"><input type="radio" name="im" value="add" checked> เพิ่มต่อจากรายชื่อเดิม (ข้ามชื่อที่ซ้ำ)</label>
+    <label class="opt"><input type="radio" name="im" value="rep"> แทนที่รายชื่อทั้งหมด</label>
+  </div>
+  <div class="row"><button class="btn" id="iTpl" type="button">ดาวน์โหลดไฟล์ตัวอย่าง</button><button class="btn pri" id="iGo" type="button" disabled>นำเข้ารายชื่อ</button></div>
+</div></dialog>
+
+<dialog id="dA"><div class="dl">
+  <div class="dh"><div><h2>เพิ่มรายชื่อ</h2><p>หนึ่งคนต่อหนึ่งบรรทัด ใส่หน่วยงานต่อท้ายด้วยเครื่องหมายจุลภาคได้</p></div><button class="x" data-close aria-label="ปิด">×</button></div>
+  <label class="fld"><span>รายชื่อ</span><textarea id="aTxt" rows="6" placeholder="สมชาย ใจดี, ฝ่ายการตลาด&#10;วรรณา ศรีสุข"></textarea></label>
+  <button class="btn pri big" id="aGo" type="button">เพิ่มรายชื่อ</button>
+</div></dialog>
+
+<dialog id="dS"><div class="dl">
+  <div class="dh"><div><h2>ตั้งค่าคลาส</h2><p>ใช้ร่วมกันทุกเครื่องที่เปิดหน้านี้</p></div><button class="x" data-close aria-label="ปิด">×</button></div>
+  <label class="fld"><span>ชื่อคลาส</span><input id="sTitle" maxlength="80"></label>
+  <div class="row">
+    <label class="fld"><span>เวลาเริ่มเรียน</span><input id="sStart" type="time"></label>
+    <label class="fld"><span>วันที่ของรอบเช็คชื่อ</span><input id="sDate" type="date"></label>
+  </div>
+  <label class="opt"><input type="checkbox" id="sReq"> บังคับเซ็นลายเซ็นก่อนยืนยัน</label>
+  <button class="btn pri big" id="sGo" type="button">บันทึก</button>
+  <button class="btn danger" id="sWipe" type="button">ลบรายชื่อทั้งหมด</button>
+</div></dialog>
+
+<dialog id="dT"><div class="dl">
+  <div class="dh"><div><h2 id="tH">ข้อมูลการเช็คชื่อ</h2><p>คัดลอกข้อความนี้ไปวางใน Google Sheets หรือ Excel</p></div><button class="x" data-close aria-label="ปิด">×</button></div>
+  <textarea id="tTxt" rows="9" readonly style="font-size:13px;border:1.5px solid var(--line);border-radius:12px;padding:10px;background:var(--bg)"></textarea>
+  <button class="btn pri big" id="tCopy" type="button">คัดลอก</button>
+</div></dialog>
+
+<footer class="foot" id="foot"><button class="btn" id="bLock" type="button">สำหรับผู้ดูแล</button><p class="ver">เว็บเช็คชื่อคลาส Claude AI · เวอร์ชัน 1.3.0 · อัปเดต 14 พ.ย. 2569</p></footer>
+
+<dialog id="dP"><div class="dl">
+  <div class="dh"><div><h2>เมนูผู้ดูแล</h2><p>ใส่รหัสเพื่อนำเข้า แก้ไข หรือส่งออกรายชื่อ</p></div><button class="x" data-close aria-label="ปิด">×</button></div>
+  <label class="fld"><span>รหัสผู้ดูแล</span><input id="pinIn" type="password" autocomplete="off"></label>
+  <button class="btn pri big" id="pinGo" type="button">เข้าสู่เมนูผู้ดูแล</button>
+</div></dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="config.js"></script>
+<script>
+{
+const APP_VERSION='1.3.0';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const p2=n=>String(n).padStart(2,'0');
+const dstr=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const S={people:[],checks:{},set:{title:'คลาส Claude AI',start:'09:00',requireSig:true},date:dstr(new Date()),f:'all',q:'',admin:false,write:true,mode:'local',warn:'',pin:''};
+let unC=null,cur=null,parsed=[];
+const L={people:new Map(),checks:new Map(),set:null,cb:{}};
+
+/* ค่าตั้งต้นอ่านจากไฟล์ config.js (window.CHECKIN_CONFIG) — แก้ที่ไฟล์นั้น ไม่ต้องแก้ไฟล์นี้ */
+const CFG=window.CHECKIN_CONFIG||{};
+const CONFIG={GAS_URL:String(CFG.GAS_URL||'').trim(),ADMIN_PIN:String(CFG.ADMIN_PIN||''),POLL_MS:Number(CFG.POLL_MS)||15000};
+const SEED=Array.isArray(CFG.SEED)?CFG.SEED:[];
+const LS='claude-checkin-v1';
+
+const emit=()=>{L.cb.p&&L.cb.p();L.cb.c&&L.cb.c();L.cb.s&&L.cb.s()};
+function saveLS(){try{localStorage.setItem(LS,JSON.stringify({people:[...L.people.values()],checks:[...L.checks.values()],set:L.set}))}catch(e){}}
+function loadLS(){try{const o=JSON.parse(localStorage.getItem(LS)||'null');if(!o)return false;o.people.forEach(p=>L.people.set(p.id,p));o.checks.forEach(c=>L.checks.set(c.date+'__'+c.pid,c));L.set=o.set;return true}catch(e){return false}}
+let outbox=[];try{outbox=JSON.parse(localStorage.getItem(LS+'-out')||'[]')}catch(e){}
+const saveOut=()=>{try{localStorage.setItem(LS+'-out',JSON.stringify(outbox))}catch(e){}};
+async function post(op){const r=await fetch(CONFIG.GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({pin:S.pin||'',...op})});return r.json()}
+let flushing=false;
+async function flush(){if(!CONFIG.GAS_URL||flushing)return;flushing=true;
+  try{while(outbox.length){const j=await post(outbox[0]);
+      if(!j.ok)toast(j.error==='pin'?'รหัสผู้ดูแลไม่ถูกต้อง รายการนี้ไม่ถูกบันทึกใน Google Sheets':'Google Sheets ไม่รับข้อมูล: '+j.error);
+      outbox.shift();saveOut()}
+    if(S.warn.includes('Google'))S.warn=''}
+  catch(e){S.warn=`ยังส่งข้อมูลไป Google Sheets ไม่ได้ (รอส่ง ${outbox.length} รายการ) ระบบจะลองใหม่อัตโนมัติ ข้อมูลยังเก็บไว้ในเครื่องนี้`}
+  finally{flushing=false;banner()}}
+function queue(op){if(!CONFIG.GAS_URL)return;outbox.push(op);saveOut();flush().then(()=>pull())}
+async function pull(){if(!CONFIG.GAS_URL||flushing||outbox.length)return null;
+  try{const r=await fetch(CONFIG.GAS_URL+'?action=state&t='+Date.now());const j=await r.json();if(!j.ok||flushing||outbox.length)return null;
+    const old=L.checks;L.people=new Map(j.people.map(p=>[p.id,p]));
+    L.checks=new Map(j.checkins.map(c=>{const k=c.date+'__'+c.pid;if(!c.sig&&old.get(k)&&old.get(k).sig)c.sig=old.get(k).sig;if(!c.fix)delete c.fix;return[k,c]}));
+    if(j.settings&&Object.keys(j.settings).length)L.set=j.settings;
+    saveLS();if(S.warn.includes('Google'))S.warn='';emit();return j}
+  catch(e){S.warn='เชื่อมต่อ Google Sheets ไม่ได้ กำลังแสดงข้อมูลที่เก็บไว้ในเครื่องนี้';banner();return null}}
+const A={
+  watchPeople(cb){L.cb.p=()=>cb([...L.people.values()],false);L.cb.p();return()=>{}},
+  watchChecks(date,cb){L.cb.c=()=>cb([...L.checks.values()].filter(c=>c.date===date));L.cb.c();return()=>{}},
+  watchSet(cb){L.cb.s=()=>cb(L.set);L.cb.s();return()=>{}},
+  async putPerson(p){L.people.set(p.id,p);saveLS();L.cb.p&&L.cb.p();queue({action:'putPeople',people:[p]})},
+  async putPeople(list){list.forEach(p=>L.people.set(p.id,p));saveLS();L.cb.p&&L.cb.p();queue({action:'putPeople',people:list})},
+  async delPerson(id){L.people.delete(id);saveLS();L.cb.p&&L.cb.p();queue({action:'delPerson',id})},
+  async clearPeople(){L.people.clear();saveLS();L.cb.p&&L.cb.p();queue({action:'clearPeople'})},
+  async putCheck(c){L.checks.set(c.date+'__'+c.pid,c);saveLS();L.cb.c&&L.cb.c();const p=L.people.get(c.pid)||{};
+    queue({action:'checkin',checkin:{...c,org:p.org||'',time:new Date(c.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),status:status(c.at,c.date).t}})},
+  async delCheck(date,pid){L.checks.delete(date+'__'+pid);saveLS();L.cb.c&&L.cb.c();queue({action:'uncheck',date,pid})},
+  async putSet(v){L.set=v;saveLS();L.cb.s&&L.cb.s();queue({action:'settings',settings:v})}
+};
+async function safe(p,okMsg){try{await p;if(okMsg)toast(okMsg);return true}catch(e){toast('บันทึกไม่สำเร็จ ลองอีกครั้ง');return false}}
+const pool=async(items,fn,n,onp)=>{let i=0,d=0,bad=0;const run=async()=>{while(i<items.length){const it=items[i++];try{await fn(it)}catch(e){bad++}d++;onp&&onp(d)}};await Promise.all(Array.from({length:Math.min(n,items.length)||0},run));return bad};
+const nid=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const key=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
+
+/* ---------- helpers ---------- */
+const fmtT=ms=>new Date(ms).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})+' น.';
+function status(at,date){
+  const [h,m]=(S.set.start||'09:00').split(':').map(Number);const st=new Date(date+'T00:00:00');st.setHours(h||0,m||0,0,0);
+  const d=Math.floor((at-st)/60000);
+  if(d<=0)return{k:'ok',t:'ตรงเวลา'};
+  return{k:'late',t:d<60?`สาย ${d} นาที`:`สาย ${Math.floor(d/60)} ชม. ${d%60} นาที`};
+}
+const ch1=w=>(String(w||'').replace(/^[เแโใไ]+/,'')||String(w||'')).slice(0,1);
+const initials=n=>{const w=String(n).trim().split(/\s+/);return(ch1(w[0]||'?')+ch1(w[1])).toUpperCase()};
+const hue=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return'c'+(h%6)};
+const sub=p=>[p.nick&&('('+p.nick+')'),p.org,p.code].filter(Boolean).join(' · ');
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)}
+
+/* ---------- render ---------- */
+function banner(){
+  const b=[];
+  if(S.mode==='local'&&S.admin)b.push('ยังไม่ได้เชื่อม Google Sheets: ข้อมูลเก็บไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น ใส่ GAS_URL ในไฟล์ config.js เพื่อบันทึกลง Google Sheets');
+  if(S.warn)b.push(S.warn);
+    if(S.date!==dstr(new Date()))b.push('กำลังดูรอบเช็คชื่อของวันที่ '+new Date(S.date+'T00:00:00').toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'}));
+  $('#banner').innerHTML=b.map(x=>`<p class="note">${esc(x)}</p>`).join('');
+}
+function render(pulse){
+  const ppl=[...S.people].sort((a,b)=>(a.order??0)-(b.order??0)||String(a.name).localeCompare(b.name,'th'));
+  let ok=0,late=0;
+  for(const p of ppl){const c=S.checks[p.id];if(c){status(c.at,c.date).k==='ok'?ok++:late++}}
+  const n=ppl.length,inn=ok+late;
+  $('#rNum').textContent=inn;$('#rOf').textContent=`จาก ${n} คน`;
+  $('#ringFg').style.strokeDashoffset=326.7*(1-(n?inn/n:0));
+  $('#sOk').textContent=ok;$('#sLate').textContent=late;$('#sWait').textContent=n-inn;
+  $('#hTitle').textContent='เช็คชื่อ '+(S.set.title||'คลาส Claude AI');
+  $('#hStart').textContent='เริ่มเรียน '+(S.set.start||'09:00')+' น.';
+  $('#hDate').textContent=new Date(S.date+'T00:00:00').toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('#adm').hidden=!S.admin;
+  const nfix=ppl.filter(p=>S.checks[p.id]&&S.checks[p.id].fix).length;$('#chFix').hidden=!(S.admin&&nfix);$('#chFix').textContent=`ขอแก้ชื่อ (${nfix})`;if(S.f==='fix'&&!nfix&&S.admin){S.f='all';document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f==='all'))}
+  banner();
+  const list=$('#list');
+  if(S.mode==='loading'){list.innerHTML='<p class="mute">กำลังโหลดรายชื่อ…</p>';return}
+  if(!n){list.innerHTML=`<div class="empty" style="grid-column:1/-1">
+    <svg viewBox="0 0 120 120"><rect x="26" y="18" width="68" height="88" rx="12" fill="var(--sky)"/><rect x="44" y="10" width="32" height="16" rx="6" fill="var(--blue)"/><rect x="38" y="42" width="44" height="7" rx="3.5" fill="var(--card)"/><rect x="38" y="58" width="34" height="7" rx="3.5" fill="var(--card)"/><rect x="38" y="74" width="40" height="7" rx="3.5" fill="var(--card)"/><circle cx="88" cy="88" r="16" fill="var(--mint)"/><path d="m80 88 6 6 10-11" fill="none" stroke="var(--mintI)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h3>ยังไม่มีรายชื่อผู้เข้าเรียน</h3><p>${S.admin?'นำเข้าไฟล์ CSV หรือ Excel หรือพิมพ์เพิ่มทีละคนได้เลย':'รอผู้ดูแลคลาสเพิ่มรายชื่อสักครู่นะ'}</p>
+    ${S.admin?'<div class="tools"><button class="btn pri" data-act="imp">นำเข้า CSV / Excel</button><button class="btn" data-act="add">เพิ่มชื่อเอง</button></div>':''}</div>`;return}
+  const q=key(S.q);
+  const vis=ppl.filter(p=>{const c=!!S.checks[p.id];if(S.f==='in'&&!c)return false;if(S.f==='wait'&&c)return false;if(S.f==='fix'&&!(c&&S.checks[p.id].fix))return false;
+    return!q||key([p.name,p.nick,p.code,p.org,p.email].join(' ')).includes(q)});
+  if(!vis.length){list.innerHTML=`<p class="mute" style="grid-column:1/-1">ไม่พบชื่อที่ค้นหา ลองพิมพ์แค่ชื่อต้นหรือชื่อเล่น</p>`;return}
+  list.innerHTML=vis.map(p=>{const c=S.checks[p.id];
+    if(c){const s=status(c.at,c.date);return`<article class="p in${pulse===p.id?' pop':''}"><div class="av ${hue(p.name)}">${esc(initials(p.name))}</div><div class="info"><b>${esc(p.name)}</b>${sub(p)?`<small>${esc(sub(p))}</small>`:''}<span class="when"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>เช็คอินเวลา ${fmtT(c.at)}</span></div>
+      <button class="done" data-v="${esc(p.id)}" aria-label="ดูรายละเอียดการเช็คอินของ ${esc(p.name)}"><small>เวลาเช็คอิน</small><span class="t">${fmtT(c.at)}</span><span class="tag ${s.k}">${s.t}</span>${c.fix?'<span class="tag fx">แจ้งแก้ชื่อ</span>':''}${c.sig?`<img class="sig" alt="ลายเซ็น" src="${esc(c.sig)}">`:''}</button></article>`}
+    return`<article class="p"><div class="av ${hue(p.name)}">${esc(initials(p.name))}</div><div class="info"><b>${esc(p.name)}</b><small>${esc(sub(p)||'ยังไม่เช็คอิน')}</small></div>
+      ${S.admin?`<button class="ed" data-v="${esc(p.id)}" aria-label="แก้ไขชื่อ ${esc(p.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/></svg></button>`:''}${S.write?`<button class="go" data-c="${esc(p.id)}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="currentColor"/></svg>เช็คอิน</button>`:''}</article>`}).join('');
+}
+
+/* ---------- clock ---------- */
+function tick(){const d=new Date();$('#hClock').textContent=p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
+  if($('#dC').open){$('#cTime').textContent=fmtT(Date.now());const s=status(Date.now(),S.date);const e=$('#cStat');e.className='tag '+s.k;e.textContent=s.t}}
+
+/* ---------- signature pad ---------- */
+const pad=$('#pad');let ctx,drawing=false,last=null,inked=false;
+function sizePad(){const r=pad.getBoundingClientRect(),k=window.devicePixelRatio||1;pad.width=Math.round(r.width*k);pad.height=Math.round(r.height*k);
+  ctx=pad.getContext('2d');ctx.setTransform(k,0,0,k,0,0);ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=2.8;ctx.strokeStyle='#1c4f8f';ctx.fillStyle='#1c4f8f';inked=false;padState()}
+const pt=e=>{const r=pad.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+function padState(){$('#hint').style.display=inked?'none':'';$('#cOk').disabled=!S.write||(S.set.requireSig!==false&&!inked)}
+pad.addEventListener('pointerdown',e=>{e.preventDefault();pad.setPointerCapture(e.pointerId);drawing=true;last=pt(e);ctx.beginPath();ctx.arc(last.x,last.y,1.3,0,7);ctx.fill();if(!inked){inked=true;padState()}});
+pad.addEventListener('pointermove',e=>{if(!drawing)return;const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+  for(const ev of evs){const p=pt(ev),m={x:(last.x+p.x)/2,y:(last.y+p.y)/2};ctx.beginPath();ctx.moveTo(last.mx??last.x,last.my??last.y);ctx.quadraticCurveTo(last.x,last.y,m.x,m.y);ctx.stroke();last={...p,mx:m.x,my:m.y}}});
+['pointerup','pointercancel','pointerleave'].forEach(t=>pad.addEventListener(t,()=>{drawing=false}));
+$('#clr').onclick=()=>{ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,pad.width,pad.height);ctx.restore();inked=false;padState()};
+function sigData(){if(!inked)return'';const o=document.createElement('canvas');o.width=420;o.height=Math.round(420*pad.height/pad.width);
+  o.getContext('2d').drawImage(pad,0,0,o.width,o.height);let u=o.toDataURL('image/png');
+  if(u.length>45000){const g=o.getContext('2d');g.globalCompositeOperation='destination-over';g.fillStyle='#fff';g.fillRect(0,0,o.width,o.height);u=o.toDataURL('image/jpeg',.6)}
+  if(u.length>45000){const k=document.createElement('canvas');k.width=280;k.height=Math.round(280*o.height/o.width);const g=k.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,k.width,k.height);g.drawImage(o,0,0,k.width,k.height);u=k.toDataURL('image/jpeg',.5)}return u}
+
+/* ---------- check-in flow ---------- */
+function openCheck(id){const p=S.people.find(x=>x.id===id);if(!p)return;cur=p;
+  $('#cAv').className='av '+hue(p.name);$('#cAv').textContent=initials(p.name);$('#cName').textContent=p.name;$('#cSub').textContent=sub(p)||S.set.title;
+  $('#cReq').textContent=S.set.requireSig===false?'(ไม่บังคับ)':'(จำเป็น)';
+  $('#fixF').hidden=true;$('#fixT').hidden=false;$('#fixIn').value=p.name;
+  $('#dC').showModal();tick();requestAnimationFrame(sizePad)}
+$('#fixT').onclick=()=>{$('#fixT').hidden=true;$('#fixF').hidden=false;$('#fixIn').focus();$('#fixIn').select()};
+$('#cOk').onclick=async()=>{if(!cur)return;const p=cur,at=Date.now(),btn=$('#cOk');btn.disabled=true;
+  const fx=$('#fixF').hidden?'':$('#fixIn').value.trim().replace(/\s+/g,' ');const fix=fx&&fx!==p.name?{fix:fx}:{};
+  const ok=await safe(A.putCheck({date:S.date,pid:p.id,name:p.name,at,sig:sigData(),...fix}));
+  btn.disabled=false;if(!ok)return;$('#dC').close();S.q='';$('#q').value='';render(p.id);
+  const st=status(at,S.date);$('#okName').textContent=p.name;$('#okTime').textContent=fmtT(at);$('#okStat').className='tag '+st.k;$('#okStat').textContent=st.t;
+  $('#okFix').hidden=!fix.fix;$('#okFix').textContent=fix.fix?'ส่งคำขอแก้ชื่อเป็น “'+fix.fix+'” แล้ว':'';
+  $('#dOk').showModal();clearTimeout(okT);okT=setTimeout(()=>{if($('#dOk').open)$('#dOk').close()},6000)};
+let okT;$('#okGo').onclick=()=>$('#dOk').close();
+let undoArm=false;
+function openView(id){const p=S.people.find(x=>x.id===id),c=S.checks[id];if(!p||(!c&&!S.admin))return;cur=p;
+  $('#vAv').className='av '+hue(p.name);$('#vAv').textContent=initials(p.name);$('#vName').textContent=p.name;$('#vSub').textContent=sub(p)||S.set.title;
+  $('#vNow').hidden=!c;$('#vSig').hidden=!c;
+  if(c){const s=status(c.at,c.date);$('#vTime').textContent=fmtT(c.at);$('#vStat').className='tag '+s.k;$('#vStat').textContent=s.t;
+    $('#vSig').innerHTML=c.sig?`<img alt="ลายเซ็นของ ${esc(p.name)}" src="${esc(c.sig)}">`:'<p class="mute">ไม่ได้เซ็นลายเซ็น</p>'}
+  const fx=c&&c.fix;$('#vFix').hidden=!fx;
+  if(fx)$('#vFix').innerHTML=`<span>ผู้เข้าเรียนแจ้งว่าชื่อที่ถูกต้องคือ</span><strong style="font-size:19px">${esc(fx)}</strong>${S.admin?'<button class="btn" id="fxOk" type="button" style="margin-left:auto">ใช้ชื่อนี้</button>':''}`;
+  $('#vEdit').hidden=!S.admin;$('#eName').value=p.name;$('#eOrg').value=p.org||'';
+  undoArm=false;$('#vUndo').textContent='ยกเลิกการเช็คอิน';$('#vUndo').hidden=!S.admin||!c;$('#dV').showModal()}
+$('#vFix').onclick=e=>{if(e.target.id==='fxOk'){$('#eName').value=S.checks[cur.id].fix;$('#eGo').click()}};
+$('#eGo').onclick=async()=>{const p=cur,n=$('#eName').value.trim().replace(/\s+/g,' '),o=$('#eOrg').value.trim();if(!n){toast('ใส่ชื่อ-นามสกุลก่อน');return}
+  const c=S.checks[p.id];if(n!==p.name||o!==(p.org||'')){if(!await safe(A.putPerson({...p,name:n,org:o})))return}
+  if(c&&(c.fix||c.name!==n)){const {fix,...rest}=c;if(!await safe(A.putCheck({...rest,name:n})))return}
+  toast('บันทึกการแก้ไขแล้ว');$('#dV').close()};
+$('#vUndo').onclick=async()=>{if(!undoArm){undoArm=true;$('#vUndo').textContent='กดอีกครั้งเพื่อยืนยันการยกเลิก';return}
+  if(await safe(A.delCheck(S.date,cur.id),'ยกเลิกการเช็คอินแล้ว'))$('#dV').close()};
+
+/* ---------- import ---------- */
+function parseCSV(t){const first=t.split(/\r?\n/)[0]||'';const cnt=ch=>first.split(ch).length;const d=cnt('\t')>cnt(',')?'\t':cnt(';')>cnt(',')?';':',';
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;else if(c===d){row.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}else f+=c}
+  if(f||row.length){row.push(f);rows.push(row)}return rows}
+function detect(r){const m={};r.forEach((h,i)=>{const s=key(h);if(!s)return;
+  if(/ชื่อเล่น|nick/.test(s))m.nick??=i;
+  else if(/ชื่อ.{0,3}(นาม)?สกุล|full ?name|^name$|ชื่อผู้เข้า|ผู้เข้าเรียน|^ชื่อ ?- ?สกุล/.test(s))m.full??=i;
+  else if(/^(นามสกุล|สกุล|last ?name|surname|lastname)$/.test(s))m.last??=i;
+  else if(/^(ชื่อ|ชื่อจริง|first ?name|firstname)$/.test(s))m.first??=i;
+  else if(/อีเมล|e-?mail/.test(s))m.email??=i;
+  else if(/เบอร์|โทร|phone|tel|mobile/.test(s))m.phone??=i;
+  else if(/รหัส|^id$|code|employee|student/.test(s))m.code??=i;
+  else if(/บริษัท|หน่วยงาน|องค์กร|แผนก|ฝ่าย|company|org|department|team/.test(s))m.org??=i});return m}
+function mapRows(rows){rows=rows.map(r=>r.map(c=>String(c??'').trim())).filter(r=>r.some(Boolean));let m=null,start=0;
+  for(let i=0;i<Math.min(5,rows.length);i++){const d=detect(rows[i]);if(d.full!=null||d.first!=null){m=d;start=i+1;break}}
+  if(!m){const numeric=rows.every(r=>/^\d*$/.test(r[0]||''));m={full:numeric?1:0}}
+  const g=(r,k)=>m[k]!=null?(r[m[k]]||''):'';
+  return rows.slice(start).map(r=>({name:(g(r,'full')||[g(r,'first'),g(r,'last')].filter(Boolean).join(' ')).replace(/\s+/g,' '),nick:g(r,'nick'),code:g(r,'code'),org:g(r,'org'),email:g(r,'email'),phone:g(r,'phone')})).filter(p=>p.name)}
+async function readFile(file){const buf=await file.arrayBuffer();
+  if(/\.(xlsx|xls)$/i.test(file.name)){if(!window.XLSX)throw new Error('ตัวอ่านไฟล์ Excel ยังโหลดไม่เสร็จ ลองอีกครั้งในอีกสักครู่');
+    const wb=XLSX.read(buf,{type:'array'});return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false})}
+  let t=new TextDecoder('utf-8').decode(buf);if(t.includes(String.fromCharCode(65533))){try{t=new TextDecoder('windows-874').decode(buf)}catch(e){}}
+  return parseCSV(t.replace(/^\uFEFF/,''))}
+async function handleFile(file){if(!file)return;try{parsed=mapRows(await readFile(file))}catch(e){toast(e.message||'อ่านไฟล์ไม่สำเร็จ');return}
+  const have=new Set(S.people.map(p=>key(p.name)));const dup=parsed.filter(p=>have.has(key(p.name))).length;
+  $('#iRes').hidden=false;$('#iGo').disabled=!parsed.length;
+  $('#iSum').textContent=parsed.length?`พบ ${parsed.length} รายชื่อจาก “${file.name}”${dup?` · ซ้ำกับที่มีอยู่ ${dup} คน`:''}`:'ไม่พบรายชื่อในไฟล์ ตรวจสอบว่ามีคอลัมน์ “ชื่อ-นามสกุล” หรือ “ชื่อ”';
+  const cols=['name','nick','org','code','email'].filter(k=>parsed.some(p=>p[k]));const lab={name:'ชื่อ-นามสกุล',nick:'ชื่อเล่น',org:'หน่วยงาน',code:'รหัส',email:'อีเมล'};
+  $('#iPrev').innerHTML=parsed.length?`<table><tr>${cols.map(k=>`<th>${lab[k]}</th>`).join('')}</tr>${parsed.slice(0,6).map(p=>`<tr>${cols.map(k=>`<td>${esc(p[k])}</td>`).join('')}</tr>`).join('')}${parsed.length>6?`<tr><td colspan="${cols.length}" class="mute">และอีก ${parsed.length-6} คน</td></tr>`:''}</table>`:''}
+async function addPeople(list,replace){const btn=$('#iGo');
+  if(replace)await A.clearPeople();
+  const have=new Set(replace?[]:S.people.map(p=>key(p.name)));let ord=replace?0:Math.max(0,...S.people.map(p=>p.order||0));
+  const fresh=[];for(const p of list){const k=key(p.name);if(have.has(k))continue;have.add(k);fresh.push({...p,id:nid(),order:++ord,addedAt:Date.now()})}
+  const bad=0;await A.putPeople(fresh);
+  btn.textContent='นำเข้ารายชื่อ';
+  toast(bad?`เพิ่มได้ ${fresh.length-bad} คน มี ${bad} คนบันทึกไม่สำเร็จ`:`เพิ่มรายชื่อแล้ว ${fresh.length} คน`);return!bad}
+$('#file').onchange=e=>handleFile(e.target.files[0]);
+const drop=$('#drop');drop.ondragover=e=>{e.preventDefault();drop.classList.add('on')};drop.ondragleave=()=>drop.classList.remove('on');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('on');handleFile(e.dataTransfer.files[0])};
+$('#iGo').onclick=async()=>{$('#iGo').disabled=true;const rep=document.querySelector('input[name=im]:checked').value==='rep';
+  await addPeople(parsed,rep);$('#dI').close();parsed=[];$('#iRes').hidden=true;$('#file').value=''};
+$('#iTpl').onclick=()=>offer('checkin-template.csv','\uFEFFลำดับ,ชื่อ-นามสกุล,ชื่อเล่น,รหัส,บริษัท/หน่วยงาน,อีเมล,เบอร์โทร\n','แม่แบบไฟล์รายชื่อ');
+$('#aGo').onclick=async()=>{const list=$('#aTxt').value.split(/\n/).map(l=>{const [n,...o]=l.split(',');return{name:(n||'').trim().replace(/\s+/g,' '),org:o.join(',').trim(),nick:'',code:'',email:'',phone:''}}).filter(p=>p.name);
+  if(!list.length){toast('พิมพ์รายชื่ออย่างน้อยหนึ่งคน');return}if(await addPeople(list,false)){$('#aTxt').value='';$('#dA').close()}};
+
+/* ---------- export ---------- */
+function table(){const ppl=[...S.people].sort((a,b)=>(a.order??0)-(b.order??0));
+  const head=['ลำดับ','ชื่อ-นามสกุล','ชื่อเล่น','รหัส','บริษัท/หน่วยงาน','อีเมล','วันที่','สถานะ','เวลาเช็คอิน','ตรงเวลา/สาย','ลายเซ็น'];
+  return[head,...ppl.map((p,i)=>{const c=S.checks[p.id];return[i+1,p.name,p.nick,p.code,p.org,p.email,S.date,c?'มาแล้ว':'ยังไม่มา',c?new Date(c.at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}):'',c?status(c.at,c.date).t:'',c?(c.sig?'มี':'ไม่มี'):'']})]}
+const csv=()=>'\uFEFF'+table().map(r=>r.map(v=>{v=String(v??'');return/[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(',')).join('\n');
+const tsv=()=>table().map(r=>r.map(v=>String(v??'').replace(/[\t\n]/g,' ')).join('\t')).join('\n');
+function showText(h,t){$('#tH').textContent=h;$('#tTxt').value=t;$('#dT').showModal()}
+function offer(name,data,h){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800)}catch(e){showText(h,data.replace(/^\uFEFF/,''))}}
+$('#bExp').onclick=()=>offer(`checkin-claude-ai-${S.date}.csv`,csv(),'ข้อมูลการเช็คชื่อ (CSV)');
+$('#bCopy').onclick=async()=>{const t=tsv();try{await navigator.clipboard.writeText(t);toast('คัดลอกแล้ว เปิด Google Sheets แล้วกดวาง (Ctrl/⌘+V)')}catch(e){showText('วางใน Google Sheets',t)}};
+$('#tCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('#tTxt').value);toast('คัดลอกแล้ว')}catch(e){$('#tTxt').select();toast('เลือกข้อความแล้ว กดคัดลอกจากแป้นพิมพ์')}};
+
+/* ---------- settings ---------- */
+$('#bSet').onclick=()=>{$('#sTitle').value=S.set.title||'';$('#sStart').value=S.set.start||'09:00';$('#sReq').checked=S.set.requireSig!==false;$('#sDate').value=S.date;wipeArm=false;$('#sWipe').textContent='ลบรายชื่อทั้งหมด';$('#dS').showModal()};
+$('#sGo').onclick=async()=>{const v={title:$('#sTitle').value.trim()||'คลาส Claude AI',start:$('#sStart').value||'09:00',requireSig:$('#sReq').checked};
+  const nd=$('#sDate').value||dstr(new Date());if(nd!==S.date){S.date=nd;subChecks()}
+  if(JSON.stringify(v)!==JSON.stringify({title:S.set.title,start:S.set.start,requireSig:S.set.requireSig!==false})){if(!await safe(A.putSet(v),'บันทึกการตั้งค่าแล้ว'))return}
+  $('#dS').close();render()};
+let wipeArm=false;
+$('#sWipe').onclick=async()=>{if(!wipeArm){wipeArm=true;$('#sWipe').textContent=`กดอีกครั้งเพื่อลบทั้ง ${S.people.length} รายชื่อ`;return}
+  await A.clearPeople();toast('ลบรายชื่อทั้งหมดแล้ว');$('#dS').close()};
+
+/* ---------- wiring ---------- */
+$('#q').oninput=e=>{S.q=e.target.value;render()};
+document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S.f=b.dataset.f;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
+$('#list').onclick=e=>{const c=e.target.closest('[data-c]'),v=e.target.closest('[data-v]'),a=e.target.closest('[data-act]');
+  if(c)openCheck(c.dataset.c);else if(v)openView(v.dataset.v);else if(a)(a.dataset.act==='imp'?$('#bImp'):$('#bAdd')).click()};
+$('#bImp').onclick=()=>{$('#iRes').hidden=true;$('#iGo').disabled=true;$('#iGo').textContent='นำเข้ารายชื่อ';$('#file').value='';$('#dI').showModal()};
+$('#bAdd').onclick=()=>$('#dA').showModal();
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
+window.addEventListener('resize',()=>{if($('#dC').open&&!inked)sizePad()});
+
+function subChecks(){unC&&unC();S.checks={};unC=A.watchChecks(S.date,list=>{const m={};for(const c of list)m[c.pid]=c;S.checks=m;render()})}
+function start(){
+  A.watchPeople(list=>{S.people=list;render()});
+  A.watchSet(v=>{if(v)S.set={...S.set,...v};render()});
+  subChecks();
+}
+/* ---------- admin lock ---------- */
+async function tryPin(pin){if(CONFIG.GAS_URL){try{const j=await post({action:'auth',pin});return!!j.ok}catch(e){return false}}return!CONFIG.ADMIN_PIN||pin===CONFIG.ADMIN_PIN}
+function lockLabel(){$('#bLock').textContent=S.admin?'ล็อกเมนูผู้ดูแล':'สำหรับผู้ดูแล'}
+async function unlock(pin,quiet){if(await tryPin(pin)){S.admin=true;S.pin=pin;try{sessionStorage.setItem(LS+'-pin',pin)}catch(e){}render();lockLabel();if(!quiet)toast('เปิดเมนูผู้ดูแลแล้ว');return true}
+  if(!quiet)toast('รหัสไม่ถูกต้อง');return false}
+$('#bLock').onclick=()=>{if(S.admin){S.admin=false;S.pin='';try{sessionStorage.removeItem(LS+'-pin')}catch(e){}render();lockLabel();return}$('#pinIn').value='';$('#dP').showModal()};
+$('#pinGo').onclick=async()=>{if(await unlock($('#pinIn').value.trim()))$('#dP').close()};
+$('#pinIn').onkeydown=e=>{if(e.key==='Enter')$('#pinGo').click()};
+
+S.mode=CONFIG.GAS_URL?'sheet':'local';
+if(!loadLS()&&SEED.length&&!CONFIG.GAS_URL){SEED.forEach(p=>L.people.set(p.id,{nick:'',code:'',email:'',phone:'',...p}));saveLS()}
+start();tick();setInterval(tick,1000);
+(async()=>{let pin='';try{pin=sessionStorage.getItem(LS+'-pin')||''}catch(e){}
+  await unlock(pin,true);lockLabel();
+  if(CONFIG.GAS_URL){await flush();const j=await pull();
+    if(j&&!j.people.length&&SEED.length){try{await post({action:'seed',people:SEED});await pull()}catch(e){}}
+    setInterval(()=>{outbox.length?flush():pull()},CONFIG.POLL_MS)}
+})();
+}
+</script>
+</body>
+</html>
