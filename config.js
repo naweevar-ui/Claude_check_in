@@ -1,7 +1,10 @@
 /*
  * ตั้งค่าเว็บเช็คชื่อ — แก้เฉพาะไฟล์นี้
  *
- * GAS_URL   : ลิงก์ Web app ที่ได้จาก Google Apps Script (ลงท้ายด้วย /exec)
+ * SUPABASE_URL / SUPABASE_KEY : ฐานข้อมูลและระบบล็อกอิน Supabase (คีย์ publishable เปิดเผยได้ ข้อมูลถูกป้องกันด้วย Row Level Security)
+ * ADMIN_EMAIL : Gmail ของผู้ดูแล (สิทธิ์จริงอยู่ในตาราง admins ของ Supabase ไฟล์นี้ใช้แค่เติมอีเมลในหน้าล็อกอิน)
+ *             ถ้าใส่ SUPABASE_URL แล้ว เว็บจะใช้ Supabase แทน Google Sheets
+ * GAS_URL   : (เดิม) ลิงก์ Web app ที่ได้จาก Google Apps Script (ลงท้ายด้วย /exec)
  *             เว้นว่าง = ยังไม่เชื่อม Google Sheets ข้อมูลจะอยู่ในเบราว์เซอร์เครื่องนั้นเครื่องเดียว
  * ADMIN_PIN : ใช้เฉพาะตอนที่ GAS_URL ว่าง (ถ้าเชื่อม Google Sheets ให้ตั้ง PIN ใน apps-script/Code.gs แทน
  *             เพราะไฟล์นี้อยู่บน GitHub ใครก็เปิดอ่านได้)
@@ -10,7 +13,10 @@
  *             หมายเหตุ: ถ้า repo เป็นแบบ Public ใครก็เปิดอ่านรายชื่อนี้ได้
  */
 window.CHECKIN_CONFIG = {
-  GAS_URL: 'https://script.google.com/macros/s/AKfycbyL1WL_WVgH5ALhhwF3_H7HEgbVKD7PsA2KqvFqyAwxcZB5Doqc_LZrvdh_VLxzUN_Q/exec',
+  SUPABASE_URL: 'https://hkaqqqoqjbssmukrzuck.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_NtK3SEEC7sAoTJ7IzKVNLg_-slo59EC',
+  ADMIN_EMAIL: 'naweevar@gmail.com',
+  GAS_URL: '',
   ADMIN_PIN: '',
   POLL_MS: 15000,
   // รายชื่อผู้เข้าเรียน 22 คน (ขึ้นทันทีแม้ยังไม่เชื่อม Google Sheets)

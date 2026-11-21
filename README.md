@@ -1,6 +1,25 @@
 # เว็บเช็คชื่อคลาส Claude AI
 
-**เวอร์ชัน 1.4.2** · อัปเดต 14 พ.ย. 2569 · ดูประวัติการเปลี่ยนแปลงใน [CHANGELOG.md](CHANGELOG.md)
+**เวอร์ชัน 2.0.0** · อัปเดต 21 พ.ย. 2569 · ดูประวัติการเปลี่ยนแปลงใน [CHANGELOG.md](CHANGELOG.md)
+
+## ฐานข้อมูลและการล็อกอิน (Supabase) ตั้งแต่เวอร์ชัน 2.0.0
+
+- โปรเจกต์ Supabase: `claude-check-in` (`hkaqqqoqjbssmukrzuck`, ภูมิภาค Singapore) ค่าเชื่อมต่ออยู่ใน `config.js`
+- ผู้เข้าเรียนเช็คชื่อได้เลยโดยไม่ต้องล็อกอิน ผู้ดูแลเข้าสู่ระบบด้วย Google ที่ `login.html`
+- สิทธิ์ผู้ดูแลกำหนดในตาราง `admins` (ตอนนี้มี naweevar@gmail.com) เพิ่มผู้ดูแลด้วย SQL: `insert into admins(email) values ('อีเมล@gmail.com');`
+- ตาราง: `people` (รายชื่อ), `people_contact` (อีเมล/เบอร์ เห็นเฉพาะผู้ดูแล), `checkins` (เช็คอินรายวัน), `settings` (ชื่อคลาส เวลาเริ่ม บังคับลายเซ็น)
+
+### เปิดใช้การล็อกอินด้วย Google (ทำครั้งเดียว)
+1. Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID (Web application)
+   - Authorized JavaScript origins: `https://naweevar-ui.github.io`
+   - Authorized redirect URIs: `https://hkaqqqoqjbssmukrzuck.supabase.co/auth/v1/callback`
+2. Supabase Dashboard → Authentication → Sign In / Providers → Google → เปิด แล้ววาง Client ID และ Client Secret
+3. Supabase Dashboard → Authentication → URL Configuration
+   - Site URL: `https://naweevar-ui.github.io/Claude_check_in/`
+   - Redirect URLs: `https://naweevar-ui.github.io/Claude_check_in/login.html`
+
+ส่วน Google Sheets / Apps Script ด้านล่างเป็นวิธีเดิม ใช้เมื่อเว้น `SUPABASE_URL` ว่างไว้เท่านั้น
+
 
 เว็บเช็คชื่อโทนฟ้า-ชมพูพาสเทล ผู้เข้าเรียนกดชื่อตัวเอง เซ็นลายเซ็น ระบบบันทึกเวลาเช็คอินและบอกว่าตรงเวลาหรือสาย แล้ว **บันทึกลง Google Sheets อัตโนมัติ** ใช้ได้ทั้งมือถือ แท็บเล็ต และคอมพิวเตอร์
 
